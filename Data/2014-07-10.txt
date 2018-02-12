@@ -1,0 +1,8 @@
+	Sno	Currency	traded	at	Amount	times	USD
+0	1	CHF	traded	at	1.04	times	USD
+1	1	EUR	traded	at	1.19	times	USD
+2	1	GBP	traded	at	1.3	times	USD
+3	1	OMR	traded	at	2.6	times	USD
+4	1	BHD	traded	at	2.65	times	USD
+5	1	KWD	traded	at	3.32	times	USD
+6	1	SGD	traded	at	0.74	times	USD
