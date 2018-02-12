@@ -1,13 +1,21 @@
+#Folder operations
+
 import os
+# API flask app
 from flask import Flask, request
 from flask.ext.jsonpify import jsonify
-import pandas as pd
-import json    
-from datetime import date, timedelta
 from flask import Response
-import datetime
-import requests_cache
 from flask.ext.cache import Cache
+# Panadas for dataframes
+import pandas as pd
+# Ouput Json format to the user
+import json    
+# Work with date in the data
+import datetime
+from datetime import date, timedelta
+# Enabling Caching ability
+import requests_cache
+# For Multiprocessing
 from multiprocessing import Pool
 
 
@@ -20,7 +28,6 @@ app.cache = Cache(app)
 folder = os.getcwd()+"\\Data\\"
 #folder = "C:\\Users\\Arun Kumar\\Documents\\train\\"
 currecnylist = ["CHF","EUR","GBP","OMR","BHD","KWD","SGD"]
-globCur = None
 # function for task 1 Given a date it will retrieve the currency rate of all currecny
 def task1(dateRangeA):
         dateRangeA= dateRangeA.strip()
@@ -29,7 +36,7 @@ def task1(dateRangeA):
         try:
             datetime.datetime.strptime(dateRangeA, '%Y-%m-%d')
         except:
-            resp = Response(json.dumps({"Message":"Incorrect data format, should be YYYY-MM-DD"}), status=200, mimetype='application/json')
+            resp = Response(json.dumps({"Message":"Incorrect data format, should be YYYY-MM-DD"}), status=404, mimetype='application/json')
         if(resp==""):
             try:
                 dateRangeA= dateRangeA
@@ -62,11 +69,11 @@ def task2(dateRangeA,currencyA,currencyB):
             try:
                 datetime.datetime.strptime(dateRangeA, '%Y-%m-%d')
             except:
-                resp = Response(json.dumps({"Message":"Incorrect data format, should be YYYY-MM-DD"}), status=200, mimetype='application/json')
+                resp = Response(json.dumps({"Message":"Incorrect data format, should be YYYY-MM-DD"}), status=404, mimetype='application/json')
             if (currencyA not in currecnylist):
-                resp = Response(json.dumps({"Message":"From Currency is not present in the list. Kindly verify the input"}), status=200, mimetype='application/json')
+                resp = Response(json.dumps({"Message":"From Currency is not present in the list. Kindly verify the input"}), status=404, mimetype='application/json')
             elif(currencyB not in currecnylist):
-                resp = Response(json.dumps({"Message": "To Currency is not present in the list. Kindly verify the input"}), status=200, mimetype='application/json')
+                resp = Response(json.dumps({"Message": "To Currency is not present in the list. Kindly verify the input"}), status=404, mimetype='application/json')
                 
             if(resp==""):  
                 try:
@@ -88,9 +95,9 @@ def task2(dateRangeA,currencyA,currencyB):
                     resp = Response(jsonOutput, status=200, mimetype='application/json')
                 except:
                     
-                    resp = Response(json.dumps({"Message":"Data not found for the date"}), status=200, mimetype='application/json')
+                    resp = Response(json.dumps({"Message":"Data not found for the date"}), status=404, mimetype='application/json')
         except:
-                resp = Response(json.dumps({"Message":"Unexpected error"}), status=200, mimetype='application/json')
+                resp = Response(json.dumps({"Message":"Unexpected error"}), status=404, mimetype='application/json')
         return resp
         
 
@@ -100,17 +107,16 @@ def task3(dateRangeA,dateRangeB,currencyA):
         dateRangeA= dateRangeA.strip()
         dateRangeB= dateRangeB.strip()
         currencyA = currencyA.strip().upper()
-        globCur= currencyA 
         try:
             datetime.datetime.strptime(dateRangeA, '%Y-%m-%d')
         except:
-            resp = Response(json.dumps({"Message":"Incorrect From data format, should be YYYY-MM-DD"}), status=200, mimetype='application/json')
+            resp = Response(json.dumps({"Message":"Incorrect From data format, should be YYYY-MM-DD"}), status=404, mimetype='application/json')
         try:
             datetime.datetime.strptime(dateRangeB, '%Y-%m-%d')
         except:
-            resp = Response(json.dumps({"Message":"Incorrect To data format, should be YYYY-MM-DD"}), status=200, mimetype='application/json')
+            resp = Response(json.dumps({"Message":"Incorrect To data format, should be YYYY-MM-DD"}), status=404, mimetype='application/json')
         if (currencyA not in currecnylist):
-            resp = Response(json.dumps({"Message":"From Currency is not present in the list. Kindly verify the input"}), status=200, mimetype='application/json')
+            resp = Response(json.dumps({"Message":"From Currency is not present in the list. Kindly verify the input"}), status=404, mimetype='application/json')
 
         if(resp==""):     
             yyyy1,mm1,dd1 = dateRangeA.split("-")
@@ -133,20 +139,20 @@ def task3(dateRangeA,dateRangeB,currencyA):
         return resp
 
 # Task 3 's subordinate function to process the data.   
-def multirange(actDate1,currencyA):
+def multirange(*args):
+    actDate1 = args[0][0]
+    currencyA = args[0][1]
     jsonOutput = None
-    currencyA = "EUR"
     outputJson= None
-    print(globCur)
     try:
                 outputList = []
                 datafile = pd.read_csv(folder  + actDate1 + ".txt", sep="\t")
-                currencyAValue =datafile[(datafile.Currency == globCur)]["Amount"]
+                currencyAValue =datafile[(datafile.Currency == currencyA)]["Amount"]
                 currencyAValue = currencyAValue.iloc[0]
                 outputJson = {
                         "Date": actDate1 ,
                         "Currency" : currencyA,
-                        "Conversion Rate" : globCur,
+                        "Conversion Rate" : currencyA,
                         }
                 jsonOutput  = json.dumps(outputList)
     except:
